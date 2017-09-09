@@ -1,0 +1,118 @@
+#==============================#    
+#                                       
+# xGoktug Faction Sunucu Sistemi    
+# Sürüm 1.0                         
+#                                   
+#==============================#
+
+
+#Ayarlar
+options:
+    Prefix: &5xGoktug &6Faction &2v1.0 &9» &a
+    SunucuAdı: &6Sunucu &5Adınızı &9Yazınız
+    AdminPerm: xgoktug.admin
+    VipPerm: xgoktug.vip
+    Vip+Perm: xgoktug.vipplus
+    RehberPerm: xgoktug.rehber
+    YetkiYokMesajı: &cBu Komut İçin Gerekli Yetkiye Sahip Değilsin.
+    DiscordAdresi: Discord Adresi
+    SkypeAdresi: live:Skype Adresiniz
+    
+# Lütfen Sistemin Güncel Sürümlerinden Haber Almak İçin Alttaki Kısmı Silmeyiniz...
+
+on script load:
+    set {_Surum} to text from url "https://raw.githubusercontent.com/xgoktug/xGoktugFactionSunucuSistemi/master/version"
+    if {_Surum} is "1.0":
+        send "{@Prefix} xGoktug Faction Sunucu Sisteminiz En Güncel Sürümdedir.." to console
+        stop
+    else:
+        send "{@Prefix} xGoktug Faction Sunucu Sisteminiz Güncel Değil." to console
+        send "&d &cadresinden yeni surumu yukleyebilirsiniz." to console
+        stop
+
+on player join:
+    if {@Kontrol} is true:
+        player is op:
+            set {_Surum} to text from url "https://raw.githubusercontent.com/xgoktug/xGoktugFactionSunucuSistemi/master/version"
+            if {_Surum} is "1.0":
+                stop
+            else:
+                send "&4Skript Güncel Değil." to player
+
+#Giriş Mesajları
+
+on join:
+    loop 100 times:
+        message "&f"
+    message "&7&m------ {@SunucuAdı} &7&m------"
+    message "&f"
+    message "&9» &6Sunucuya Hoş Geldin &2%player%"
+    message "&f"
+    message "&4Duyuru &9» &r%{Duyuru}%"
+    message "&3Discord Sunucumuza Bekleriz {@DiscordAdresi}"
+    message "&3Skype İletişim&7: {@SkypeAdresi}"
+    message "&f"
+    message "&2İyi Eylenceler Dileriz"
+    message "&f"
+    
+
+ 
+#Giriş Mesajındaki Duyuruyu Ayarlama
+command /duyuruayarla [<text>]:
+	permission: {@AdminPerm}
+	permission message: {@YetkiYokMesajı}
+	trigger:
+		if arg-1 is not set:
+			message "{@Prefix} &3Kullanımı: &e/DuyuruAyarla &2<Duyuru>      &7(Duyurunuzu Yazarken Minecraftın Renk Kodlarını Kullanabilirsiniz [&9RenkKodu: & &7])" 
+		if arg-1 is set:
+			set {Duyuru} to colored arg-1
+			message "{@Prefix} &eYeni Duyuru Bu Şekilde &r%colored arg 1%"
+
+
+#Ping Öğrenme
+command /ping [<offlineplayer>]:
+	trigger:
+		if arg-1 is not set:
+			message "{@Prefix} &eSenin Pingin&8: &6%player's ping%&eMS&8."
+		if arg-1 is set:
+			if player has permission "{@AdminPerm}":
+				message "{@Prefix} &c%arg 1%&e Adlı Oyuncunun Pingi&8: &6%arg 1's ping%&eMS&8."
+			else:
+				message "{@YetkiYokMesajı}"
+#-----------------------------------------------------------------------------------------------
+
+#Spawn 	
+options:
+    p:&c&lSpawn &r&d» 
+on join:
+    teleport player to {spawn}
+on first join:
+    teleport player to {spawn}
+command /setspawn:
+    permission: {@AdminPerm}
+    trigger:
+        set {spawn} to player's location
+        send "{@Prefix} &6&lDoğma Yeri Ayarlandi."
+        execute player command "/esetspawn"
+        execute player command "/authme setspawn"
+        stop			
+#-----------------------------------------------------------------------------------------------
+
+#Server Motd (Sunucu Listesinde Nasıl Görüneceği Ne Yazacağı En Fazla Kaç Oyuncu Girebilecek Onu Ayarlar Oyun İçinden) 
+on server list ping:
+	set max player count to 32
+	if {motd} is set:
+		set motd to "%{motd}%"
+	if {motd} is not set:
+		set motd to "&5xGoktug &6Faction Sunucu Sistemi &2v1.0"
+				
+command /motd [<text>]:
+	permission: {@ap}
+	permission message: {@noperm}
+	aliases: /servermotd
+	trigger:
+		if arg 1 is not set:
+			message "{@p} &eInvalid args. Usage : /motd &6(motd)"
+		if arg 1 is set:
+			set {motd} to colored arg 1
+			message "{@p} &eServer's new motd is &r%colored arg 1%"
